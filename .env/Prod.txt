@@ -1,0 +1,47 @@
+# ============================================================
+# ADF CI/CD - PROD Environment Parameters
+# ============================================================
+# These values are loaded by the reusable workflow template
+# to override ARM template parameters at deployment time.
+# DO NOT store secrets here — use GitHub Actions secrets instead.
+# ============================================================
+
+factoryName=DF-<ProjectName>-Prod-DA
+
+# --- Databricks Linked Service ---
+ls_azure_databricks_properties_typeProperties_workspaceResourceId="/subscriptions/<PROD_SUBSCRIPTION_ID>/resourceGroups/<PROD_RG>/providers/Microsoft.Databricks/workspaces/<PROD_DBX_WORKSPACE>"
+ls_azure_databricks_properties_typeProperties_domain="https://<PROD_DBX_HOST>.azuredatabricks.net/"
+ls_azure_databricks_properties_typeProperties_existingClusterId="<PROD_CLUSTER_ID>"
+
+# --- Databricks APS Linked Service ---
+ls_azure_databricks_aps_properties_typeProperties_workspaceResourceId="/subscriptions/<PROD_SUBSCRIPTION_ID>/resourceGroups/<PROD_RG>/providers/Microsoft.Databricks/workspaces/<PROD_DBX_WORKSPACE>"
+ls_azure_databricks_aps_properties_typeProperties_domain="https://<PROD_DBX_HOST>.azuredatabricks.net/"
+ls_azure_databricks_aps_properties_typeProperties_existingClusterId="<PROD_APS_CLUSTER_ID>"
+
+# --- Databricks CMM Linked Service ---
+ls_azure_databricks_cmm_properties_typeProperties_workspaceResourceId="/subscriptions/<PROD_SUBSCRIPTION_ID>/resourceGroups/<PROD_RG>/providers/Microsoft.Databricks/workspaces/<PROD_DBX_WORKSPACE>"
+ls_azure_databricks_cmm_properties_typeProperties_domain="https://<PROD_DBX_HOST>.azuredatabricks.net/"
+ls_azure_databricks_cmm_properties_typeProperties_existingClusterId="<PROD_CMM_CLUSTER_ID>"
+
+# --- Azure SQL DB Linked Service ---
+ls_azure_sql_db_properties_typeProperties_server="<PROD_SQL_SERVER>.database.windows.net"
+ls_azure_sql_db_properties_typeProperties_database="<PROD_SQL_DATABASE>"
+
+# --- Azure Key Vault Linked Service ---
+ls_azure_key_vault_properties_typeProperties_baseUrl="https://<PROD_KV_NAME>.vault.azure.net/"
+
+# --- Logic App (if applicable) ---
+# default_properties_APS_Logic_App_URL_value="https://prod-xx.<region>.logic.azure.com:443/workflows/<WORKFLOW_ID>/triggers/..."
+
+# --- OFS API (if applicable) ---
+# ls_ofs_api_conn_properties_typeProperties_url="https://<OFS_HOST>"
+# ls_ofs_api_conn_properties_typeProperties_userName="<OFS_USERNAME>"
+# default_properties_ofs_api_base_url_value="https://<OFS_HOST>"
+# default_properties_ofs_api_username_value="<OFS_USERNAME>"
+
+# --- Shared IR (if applicable) ---
+# PADASAPP002_properties_typeProperties_linkedInfo_resourceId="/subscriptions/<PROD_SUBSCRIPTION_ID>/resourcegroups/<PROD_RG>/providers/Microsoft.DataFactory/factories/<SHARED_ADF>/integrationruntimes/<IR_NAME>"
+
+# --- Blob Storage (ARM Template artifacts) ---
+containerUri="https://<PROD_STORAGE_ACCOUNT>.blob.core.windows.net/release-management"
+containerSasToken="<PROD_SAS_TOKEN>"
