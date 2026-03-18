@@ -1,0 +1,67 @@
+# ============================================================
+# ADF PROD Deployment Workflow
+# ============================================================
+# Manual trigger only (workflow_dispatch).
+# Promotes ARM templates from DEV ADF → PROD ADF using the
+# reusable deployment template from the Release Management
+# Templates repository.
+#
+# FLOW:
+#   1. Export ARM templates from DEV ADF (adf_publish branch)
+#   2. Upload linked templates to Prod blob storage
+#   3. Stop PROD ADF triggers
+#   4. Deploy ARM template with Prod parameter overrides (.env/Prod.txt)
+#   5. Restart PROD ADF triggers
+#
+# BEST PRACTICE:
+#   - Always deploy UAT first and validate before running this workflow.
+#   - Add a GitHub Environment protection rule on "Prod" requiring
+#     manual approval before the job executes.
+#
+# SECRETS REQUIRED (set at repo or org level):
+#   - AZURE_CLIENT_ID
+#   - AZURE_CLIENT_SECRET  (or configure OIDC federated identity)
+#   - AZURE_TENANT_ID
+#   - AZURE_SUBSCRIPTION_ID_PROD
+# ============================================================
+
+name: 'Prod ADF CI/CD'
+
+on:
+  workflow_dispatch:       # promote to Prod manually / via release gate
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  ADF-Deploy:
+    uses: <YOUR_ORG>/<YOUR_RELEASE_MGMT_REPO>/.github/workflows/template_new.yml@main
+    secrets: inherit
+    with:
+      # ── ARM Template ──────────────────────────────────────────
+      ParameterFileName: ArmTemplate/linkedTemplates/ArmTemplateParameters_master.json
+
+      # ── Environment label (used inside template for .env lookup) ──
+      environment: Prod
+
+      # ── Source ADF (DEV — where ARM templates are exported from) ──
+      SRC_ADF_NAME: DF-<ProjectName>-Dev-DA
+      SRC_RG:       <DEV_RESOURCE_GROUP>
+      SRC_SUBS_ID:  <DEV_SUBSCRIPTION_ID>
+      TENANT_ID:    <AZURE_TENANT_ID>
+
+      # ── Target ADF (PROD — where we deploy to) ────────────────
+      TRG_ADF_NAME: DF-<ProjectName>-Prod-DA
+      TRG_RG:       <PROD_RESOURCE_GROUP>
+      TRG_SUBS_ID:  <PROD_SUBSCRIPTION_ID>
+
+      # ── Integration Runtime mapping ───────────────────────────
+      SourceIRName: <SOURCE_IR_NAME>          # e.g. DADASAPP004
+      TargetIRName: <TARGET_IR_NAME>          # e.g. PADASAPP002 (if different in Prod)
+
+      # ── GitHub Actions Runner ─────────────────────────────────
+      Runner_Group: Prod                      # self-hosted runner group label
+
+      # ── Blob storage account for linked template upload ───────
+      STORAGE_ACCOUNT: <PROD_STORAGE_ACCOUNT>
