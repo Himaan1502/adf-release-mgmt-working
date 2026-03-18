@@ -1,0 +1,35 @@
+# ============================================================
+# ADF CI/CD - UAT Environment Parameters
+# ============================================================
+# These values are loaded by the reusable workflow template
+# to override ARM template parameters at deployment time.
+# DO NOT store secrets here — use GitHub Actions secrets instead.
+# ============================================================
+
+factoryName=DF-<ProjectName>-Tst-DA
+
+# --- Databricks Linked Service ---
+ls_azure_databricks_properties_typeProperties_workspaceResourceId="/subscriptions/<NONPROD_SUBSCRIPTION_ID>/resourceGroups/<NONPROD_RG>/providers/Microsoft.Databricks/workspaces/<UAT_DBX_WORKSPACE>"
+ls_azure_databricks_properties_typeProperties_domain="https://<UAT_DBX_HOST>.azuredatabricks.net/"
+ls_azure_databricks_properties_typeProperties_existingClusterId="<UAT_CLUSTER_ID>"
+
+# --- Databricks APS Linked Service ---
+ls_azure_databricks_aps_properties_typeProperties_workspaceResourceId="/subscriptions/<NONPROD_SUBSCRIPTION_ID>/resourceGroups/<NONPROD_RG>/providers/Microsoft.Databricks/workspaces/<UAT_DBX_WORKSPACE>"
+ls_azure_databricks_aps_properties_typeProperties_domain="https://<UAT_DBX_HOST>.azuredatabricks.net/"
+ls_azure_databricks_aps_properties_typeProperties_existingClusterId="<UAT_APS_CLUSTER_ID>"
+
+# --- Databricks CMM Linked Service ---
+ls_azure_databricks_cmm_properties_typeProperties_workspaceResourceId="/subscriptions/<NONPROD_SUBSCRIPTION_ID>/resourceGroups/<NONPROD_RG>/providers/Microsoft.Databricks/workspaces/<UAT_DBX_WORKSPACE>"
+ls_azure_databricks_cmm_properties_typeProperties_domain="https://<UAT_DBX_HOST>.azuredatabricks.net/"
+ls_azure_databricks_cmm_properties_typeProperties_existingClusterId="<UAT_CMM_CLUSTER_ID>"
+
+# --- Azure SQL DB Linked Service ---
+ls_azure_sql_db_properties_typeProperties_server="<UAT_SQL_SERVER>.database.windows.net"
+ls_azure_sql_db_properties_typeProperties_database="<UAT_SQL_DATABASE>"
+
+# --- Azure Key Vault Linked Service ---
+ls_azure_key_vault_properties_typeProperties_baseUrl="https://<UAT_KV_NAME>.vault.azure.net/"
+
+# --- Blob Storage (ARM Template artifacts) ---
+containerUri="https://<NONPROD_STORAGE_ACCOUNT>.blob.core.windows.net/release-management"
+containerSasToken="<UAT_SAS_TOKEN>"
