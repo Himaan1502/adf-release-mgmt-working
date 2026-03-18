@@ -1,0 +1,62 @@
+# ============================================================
+# ADF UAT Deployment Workflow
+# ============================================================
+# Manual trigger only (workflow_dispatch).
+# Promotes ARM templates from DEV ADF → UAT ADF using the
+# reusable deployment template from the Release Management
+# Templates repository.
+#
+# FLOW:
+#   1. Export ARM templates from DEV ADF (adf_publish branch)
+#   2. Upload linked templates to Non-Prod blob storage
+#   3. Stop UAT ADF triggers
+#   4. Deploy ARM template with UAT parameter overrides (.env/UAT.txt)
+#   5. Restart UAT ADF triggers
+#
+# SECRETS REQUIRED (set at repo or org level):
+#   - AZURE_CLIENT_ID
+#   - AZURE_CLIENT_SECRET  (or configure OIDC federated identity)
+#   - AZURE_TENANT_ID
+#   - AZURE_SUBSCRIPTION_ID
+# ============================================================
+
+name: 'UAT ADF CI/CD'
+
+on:
+  workflow_dispatch:       # promote to UAT manually / via release gate
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  ADF-Deploy:
+    uses: <YOUR_ORG>/<YOUR_RELEASE_MGMT_REPO>/.github/workflows/template_new.yml@main
+    secrets: inherit
+    with:
+      # ── ARM Template ──────────────────────────────────────────
+      ParameterFileName: ArmTemplate/linkedTemplates/ArmTemplateParameters_master.json
+
+      # ── Environment label (used inside template for .env lookup) ──
+      environment: UAT
+
+      # ── Source ADF (DEV — where ARM templates are exported from) ──
+      SRC_ADF_NAME: DF-<ProjectName>-Dev-DA
+      SRC_RG:       <DEV_RESOURCE_GROUP>
+      SRC_SUBS_ID:  <DEV_SUBSCRIPTION_ID>
+      TENANT_ID:    <AZURE_TENANT_ID>
+
+      # ── Target ADF (UAT — where we deploy to) ─────────────────
+      TRG_ADF_NAME: DF-<ProjectName>-Tst-DA
+      TRG_RG:       <NONPROD_RESOURCE_GROUP>
+      TRG_SUBS_ID:  <NONPROD_SUBSCRIPTION_ID>
+
+      # ── Integration Runtime mapping ───────────────────────────
+      SourceIRName: <SOURCE_IR_NAME>          # e.g. DADASAPP004
+      TargetIRName: <TARGET_IR_NAME>          # e.g. DADASAPP004
+
+      # ── GitHub Actions Runner ─────────────────────────────────
+      Runner_Group: Non-Prod                  # self-hosted runner group label
+
+      # ── Blob storage account for linked template upload ───────
+      STORAGE_ACCOUNT: <NONPROD_STORAGE_ACCOUNT>
