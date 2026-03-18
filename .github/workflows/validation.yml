@@ -1,0 +1,46 @@
+# ============================================================
+# ADF Validation Workflow
+# ============================================================
+# Triggers on PRs to main, uat, or dev branches.
+# Calls the reusable validation template from the Release
+# Management Templates repository.
+#
+# PURPOSE:
+#   - Validates ARM template syntax and ADF resource structure
+#     against the DEV ADF instance before any merge is allowed.
+#
+# SECRETS REQUIRED (set at repo or org level):
+#   - AZURE_CLIENT_ID        : Service Principal / OIDC App Client ID
+#   - AZURE_CLIENT_SECRET    : Service Principal Secret (if not OIDC)
+#   - AZURE_TENANT_ID        : Azure AD Tenant ID
+#   - AZURE_SUBSCRIPTION_ID  : Target Subscription ID
+# ============================================================
+
+name: 'ADF Validation'
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize        # re-run on new commits pushed to the PR
+      - reopened
+    branches:
+      - main
+      - uat
+      - dev
+  workflow_dispatch:       # allow manual trigger for ad-hoc validation
+
+permissions:
+  id-token: write          # required for OIDC token exchange
+  contents: read
+
+jobs:
+  ADF-Validate:
+    uses: <YOUR_ORG>/<YOUR_RELEASE_MGMT_REPO>/.github/workflows/validation.yml@main
+    secrets: inherit
+    with:
+      # ── Source ADF (DEV) ──────────────────────────────────────
+      ADF_NAME: DF-<ProjectName>-Dev-DA
+      RG:       <DEV_RESOURCE_GROUP>
+      SUBS_ID:  <DEV_SUBSCRIPTION_ID>
+      TENANT_ID: <AZURE_TENANT_ID>
